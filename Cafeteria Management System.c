@@ -10,6 +10,7 @@ typedef struct {
     int id;
     char name[30];
     int price;
+    int quantity;  // Added quantity field
 } MenuItem;
 
 typedef struct {
@@ -26,7 +27,7 @@ typedef struct {
 
 typedef struct {
     char name[20];
-    MenuItem menu[30];
+    MenuItem menu[50];  // Increased size for adding new items
     int menu_count;
     Order orders[100];
     int order_count;
@@ -80,7 +81,7 @@ void view_my_orders();
 int main_page();
 int cafe_menu();
 void menu_order();
-void Bill_show(int items[], int quantities[], int item_count, char customer_name[]);
+void Bill_show(int items[], int quantities[], int item_count);
 void Bill_Payment();
 void cancel_order();
 void display_order_summary(Order order);
@@ -93,6 +94,8 @@ void view_cafe_details();
 void view_all_students();
 void deactivate_student();
 void reset_all_data();
+void edit_menu_item();
+void add_menu_item();
 
 // Menu items for each cafe
 void initialize_cafes() {
@@ -104,21 +107,21 @@ void initialize_cafes() {
     cafes[0].total_revenue = 0;
 
     MenuItem vista_menu[] = {
-        {1, "Chicken Biryani", 120},
-        {2, "Mutton Biryani", 180},
-        {3, "Vegetable Khichuri", 70},
-        {4, "Chicken Khichuri", 90},
-        {5, "Chow Mein", 80},
-        {6, "Fried Rice", 70},
-        {7, "Chicken Curry", 110},
-        {8, "Beef Curry", 150},
-        {9, "Fish Curry", 130},
-        {10, "Mixed Vegetables", 60},
-        {11, "Dal Fry", 40},
-        {12, "Plain Rice", 30},
-        {13, "Naan", 20},
-        {14, "Paratha", 15},
-        {15, "Cold Drinks", 30}
+        {1, "Chicken Biryani", 120, 50},
+        {2, "Mutton Biryani", 180, 30},
+        {3, "Vegetable Khichuri", 70, 40},
+        {4, "Chicken Khichuri", 90, 45},
+        {5, "Chow Mein", 80, 60},
+        {6, "Fried Rice", 70, 55},
+        {7, "Chicken Curry", 110, 40},
+        {8, "Beef Curry", 150, 35},
+        {9, "Fish Curry", 130, 25},
+        {10, "Mixed Vegetables", 60, 50},
+        {11, "Dal Fry", 40, 70},
+        {12, "Plain Rice", 30, 100},
+        {13, "Naan", 20, 80},
+        {14, "Paratha", 15, 90},
+        {15, "Cold Drinks", 30, 120}
     };
     memcpy(cafes[0].menu, vista_menu, sizeof(vista_menu));
 
@@ -130,21 +133,21 @@ void initialize_cafes() {
     cafes[1].total_revenue = 0;
 
     MenuItem amitee_menu[] = {
-        {1, "Club Sandwich", 90},
-        {2, "Grilled Sandwich", 85},
-        {3, "Chicken Burger", 110},
-        {4, "Beef Burger", 130},
-        {5, "French Fries", 50},
-        {6, "Chicken Wings", 140},
-        {7, "Pasta Alfredo", 120},
-        {8, "Pasta Arrabiata", 120},
-        {9, "Pizza Slice", 80},
-        {10, "Garlic Bread", 45},
-        {11, "Coffee", 40},
-        {12, "Tea", 25},
-        {13, "Milkshake", 80},
-        {14, "Fresh Juice", 60},
-        {15, "Pastry", 70}
+        {1, "Club Sandwich", 90, 45},
+        {2, "Grilled Sandwich", 85, 50},
+        {3, "Chicken Burger", 110, 40},
+        {4, "Beef Burger", 130, 35},
+        {5, "French Fries", 50, 60},
+        {6, "Chicken Wings", 140, 30},
+        {7, "Pasta Alfredo", 120, 35},
+        {8, "Pasta Arrabiata", 120, 35},
+        {9, "Pizza Slice", 80, 50},
+        {10, "Garlic Bread", 45, 55},
+        {11, "Coffee", 40, 70},
+        {12, "Tea", 25, 80},
+        {13, "Milkshake", 80, 40},
+        {14, "Fresh Juice", 60, 50},
+        {15, "Pastry", 70, 45}
     };
     memcpy(cafes[1].menu, amitee_menu, sizeof(amitee_menu));
 
@@ -156,26 +159,26 @@ void initialize_cafes() {
     cafes[2].total_revenue = 0;
 
     MenuItem third_place_menu[] = {
-        {1, "Special Thai Soup", 150},
-        {2, "Spring Roll", 120},
-        {3, "Dim Sum (6 pcs)", 180},
-        {4, "Sushi Roll", 250},
-        {5, "Pad Thai Noodles", 220},
-        {6, "Teriyaki Chicken", 280},
-        {7, "Grilled Salmon", 450},
-        {8, "Beef Steak", 380},
-        {9, "Seafood Pasta", 320},
-        {10, "Mushroom Risotto", 250},
-        {11, "Caesar Salad", 180},
-        {12, "Nachos Supreme", 200},
-        {13, "Tacos (3 pcs)", 220},
-        {14, "Burrito Bowl", 260},
-        {15, "Cheese Cake", 150},
-        {16, "Chocolate Brownie", 120},
-        {17, "Ice Cream Sundae", 130},
-        {18, "Smoothie Bowl", 160},
-        {19, "Fresh Lemonade", 80},
-        {20, "Iced Latte", 140}
+        {1, "Special Thai Soup", 150, 30},
+        {2, "Spring Roll", 120, 40},
+        {3, "Dim Sum (6 pcs)", 180, 35},
+        {4, "Sushi Roll", 250, 25},
+        {5, "Pad Thai Noodles", 220, 30},
+        {6, "Teriyaki Chicken", 280, 25},
+        {7, "Grilled Salmon", 450, 15},
+        {8, "Beef Steak", 380, 20},
+        {9, "Seafood Pasta", 320, 20},
+        {10, "Mushroom Risotto", 250, 25},
+        {11, "Caesar Salad", 180, 30},
+        {12, "Nachos Supreme", 200, 35},
+        {13, "Tacos (3 pcs)", 220, 30},
+        {14, "Burrito Bowl", 260, 25},
+        {15, "Cheese Cake", 150, 30},
+        {16, "Chocolate Brownie", 120, 35},
+        {17, "Ice Cream Sundae", 130, 30},
+        {18, "Smoothie Bowl", 160, 25},
+        {19, "Fresh Lemonade", 80, 45},
+        {20, "Iced Latte", 140, 35}
     };
     memcpy(cafes[2].menu, third_place_menu, sizeof(third_place_menu));
 }
@@ -635,14 +638,10 @@ void menu_order() {
 
     // Check student balance if logged in
     if(current_logged_in_student != -1) {
+        printf("\t\tStudent: %s\n", students[current_logged_in_student].name);
         printf("\t\tStudent Balance: Tk.%.2f\n", students[current_logged_in_student].balance);
+        printf("\t\tCafeteria: %s\n\n", cafe->name);
     }
-
-    char customer_name[50];
-    printf("\t\tEnter customer name: ");
-    clearInputBuffer();
-    fgets(customer_name, 50, stdin);
-    customer_name[strcspn(customer_name, "\n")] = 0;
 
     int order_items[50], order_qty[50];
     int item_count = 0;
@@ -652,13 +651,15 @@ void menu_order() {
         system("cls");
         printHeader(cafe->name);
 
-        // Display menu
+        // Display menu with quantities
         printf("\n\t\t============================================================\n");
         printf("\t\t                       MENU                               \n");
         printf("\t\t============================================================\n");
 
         for(int i = 0; i < cafe->menu_count; i++) {
-            printf("\t\t%2d. %-25s Tk.%d\n", cafe->menu[i].id, cafe->menu[i].name, cafe->menu[i].price);
+            printf("\t\t%2d. %-25s Tk.%d (Stock: %d)\n",
+                   cafe->menu[i].id, cafe->menu[i].name,
+                   cafe->menu[i].price, cafe->menu[i].quantity);
             if((i+1) % 5 == 0 && i != cafe->menu_count-1) {
                 printf("\t\t------------------------------------------------------------\n");
             }
@@ -695,9 +696,11 @@ void menu_order() {
 
         // Validate item ID
         int valid = 0;
+        int item_index = -1;
         for(int i = 0; i < cafe->menu_count; i++) {
             if(cafe->menu[i].id == item_id) {
                 valid = 1;
+                item_index = i;
                 break;
             }
         }
@@ -717,25 +720,45 @@ void menu_order() {
             continue;
         }
 
+        // Check if enough stock is available
+        if(cafe->menu[item_index].quantity < qty) {
+            printError("Insufficient stock!");
+            printf("\t\tAvailable stock: %d\n", cafe->menu[item_index].quantity);
+            Sleep(2000);
+            continue;
+        }
+
         order_items[item_count] = item_id;
         order_qty[item_count] = qty;
-        total += cafe->menu[item_id-1].price * qty;
+        total += cafe->menu[item_index].price * qty;
         item_count++;
 
         printSuccess("Item added to order!");
         Sleep(800);
     }
 
-    Bill_show(order_items, order_qty, item_count, customer_name);
+    Bill_show(order_items, order_qty, item_count);
 }
 
-void Bill_show(int items[], int quantities[], int item_count, char customer_name[]) {
+void Bill_show(int items[], int quantities[], int item_count) {
     printHeader("ORDER BILL");
 
     Cafe *cafe = &cafes[current_cafe];
     int total = 0;
 
-    printf("\n\t\tCustomer: %s\n", customer_name);
+    // Use student name if logged in
+    char customer_name[50];
+    if(current_logged_in_student != -1) {
+        strcpy(customer_name, students[current_logged_in_student].name);
+        printf("\n\t\tCustomer: %s (Student)\n", customer_name);
+    } else {
+        printf("\t\tEnter customer name: ");
+        clearInputBuffer();
+        fgets(customer_name, 50, stdin);
+        customer_name[strcspn(customer_name, "\n")] = 0;
+        printf("\n\t\tCustomer: %s\n", customer_name);
+    }
+
     printf("\n\t\t============================================================\n");
     printf("\t\t                    ORDER DETAILS                          \n");
     printf("\t\t============================================================\n");
@@ -772,6 +795,33 @@ void Bill_show(int items[], int quantities[], int item_count, char customer_name
     scanf("%d", &confirm);
 
     if(confirm == 1) {
+        // Check stock availability again before finalizing
+        int stock_available = 1;
+        for(int i = 0; i < item_count; i++) {
+            int item_index = items[i] - 1;
+            if(cafe->menu[item_index].quantity < quantities[i]) {
+                printError("Stock changed! Some items are no longer available in requested quantity.");
+                printf("\t\t%s: Available %d, Requested %d\n",
+                       cafe->menu[item_index].name,
+                       cafe->menu[item_index].quantity,
+                       quantities[i]);
+                stock_available = 0;
+                break;
+            }
+        }
+
+        if(!stock_available) {
+            printf("\t\tPress any key to continue...");
+            getch();
+            return;
+        }
+
+        // Deduct quantities from stock
+        for(int i = 0; i < item_count; i++) {
+            int item_index = items[i] - 1;
+            cafe->menu[item_index].quantity -= quantities[i];
+        }
+
         // Create new order
         Order new_order;
         new_order.token_number = cafe->next_token++;
@@ -802,6 +852,7 @@ void Bill_show(int items[], int quantities[], int item_count, char customer_name
         printSuccess("Order placed successfully!");
         printf("\n\t\tYour Token Number: %d\n", new_order.token_number);
         printf("\t\tTotal Amount: Tk.%d\n", total);
+        printf("\t\tStatus: PENDING (Waiting for payment)\n");
 
         if(current_logged_in_student != -1) {
             printf("\t\tRemaining Balance: Tk.%.2f\n", students[current_logged_in_student].balance);
@@ -869,6 +920,7 @@ void Bill_Payment() {
 
     printSuccess("Payment successful!");
     printf("\t\tChange: Tk.%d\n", change);
+    printf("\t\tOrder status: PAID\n");
 
     generate_receipt(cafe->orders[found], change);
 
@@ -915,6 +967,12 @@ void cancel_order() {
     scanf("%d", &confirm);
 
     if(confirm == 1) {
+        // Return stock to inventory
+        for(int i = 0; i < cafe->orders[found].item_count; i++) {
+            int item_index = cafe->orders[found].items[i] - 1;
+            cafe->menu[item_index].quantity += cafe->orders[found].quantities[i];
+        }
+
         cafe->orders[found].status = 2;
         save_cafe_data();
 
@@ -930,6 +988,7 @@ void cancel_order() {
         }
 
         printSuccess("Order cancelled successfully!");
+        printf("\t\tStock has been returned to inventory.\n");
     } else {
         printInfo("Cancellation aborted.");
     }
@@ -1083,10 +1142,11 @@ void view_cafe_details() {
         printf("\t\tNext Token: %d\n", cafes[i].next_token);
         printf("\t\tTotal Revenue: Tk.%d\n", cafes[i].total_revenue);
 
-        // Show sample menu items
-        printf("\t\tSample Menu Items:\n");
+        // Show sample menu items with stock
+        printf("\t\tSample Menu Items (with stock):\n");
         for(int j = 0; j < 5 && j < cafes[i].menu_count; j++) {
-            printf("\t\t  - %-25s Tk.%d\n", cafes[i].menu[j].name, cafes[i].menu[j].price);
+            printf("\t\t  - %-25s Tk.%d (Stock: %d)\n",
+                   cafes[i].menu[j].name, cafes[i].menu[j].price, cafes[i].menu[j].quantity);
         }
         printf("\n");
     }
@@ -1145,6 +1205,130 @@ void deactivate_student() {
     }
 
     printError("Student not found!");
+    printf("\t\tPress any key to continue...");
+    getch();
+}
+
+void edit_menu_item() {
+    printHeader("EDIT MENU ITEM");
+
+    int cafe_choice;
+    printf("\t\tSelect Cafeteria:\n");
+    printf("\t\t1. VISTA\n");
+    printf("\t\t2. AMITEE\n");
+    printf("\t\t3. THIRD PLACE\n");
+    printf("\t\tEnter choice: ");
+    scanf("%d", &cafe_choice);
+
+    if(cafe_choice < 1 || cafe_choice > 3) {
+        printError("Invalid choice!");
+        Sleep(1500);
+        return;
+    }
+
+    current_cafe = cafe_choice - 1;
+    Cafe *cafe = &cafes[current_cafe];
+
+    printf("\n\t\tCurrent Menu Items:\n");
+    printf("\t\t============================================================\n");
+    for(int i = 0; i < cafe->menu_count; i++) {
+        printf("\t\t%2d. %-25s Tk.%d (Stock: %d)\n",
+               cafe->menu[i].id, cafe->menu[i].name,
+               cafe->menu[i].price, cafe->menu[i].quantity);
+    }
+    printf("\t\t============================================================\n");
+
+    int item_id;
+    printf("\n\t\tEnter item ID to edit: ");
+    scanf("%d", &item_id);
+
+    int found = -1;
+    for(int i = 0; i < cafe->menu_count; i++) {
+        if(cafe->menu[i].id == item_id) {
+            found = i;
+            break;
+        }
+    }
+
+    if(found == -1) {
+        printError("Item not found!");
+        Sleep(1500);
+        return;
+    }
+
+    printf("\n\t\tEditing: %s\n", cafe->menu[found].name);
+    printf("\t\tCurrent Price: Tk.%d\n", cafe->menu[found].price);
+    printf("\t\tCurrent Stock: %d\n", cafe->menu[found].quantity);
+
+    printf("\n\t\tEnter new price (0 to keep current): Tk.");
+    int new_price;
+    scanf("%d", &new_price);
+    if(new_price > 0) {
+        cafe->menu[found].price = new_price;
+    }
+
+    printf("\t\tEnter new quantity (0 to keep current): ");
+    int new_qty;
+    scanf("%d", &new_qty);
+    if(new_qty > 0) {
+        cafe->menu[found].quantity = new_qty;
+    } else if(new_qty == 0) {
+        // Keep current quantity
+    }
+
+    save_cafe_data();
+    printSuccess("Menu item updated successfully!");
+    printf("\t\tPress any key to continue...");
+    getch();
+}
+
+void add_menu_item() {
+    printHeader("ADD MENU ITEM");
+
+    int cafe_choice;
+    printf("\t\tSelect Cafeteria:\n");
+    printf("\t\t1. VISTA\n");
+    printf("\t\t2. AMITEE\n");
+    printf("\t\t3. THIRD PLACE\n");
+    printf("\t\tEnter choice: ");
+    scanf("%d", &cafe_choice);
+
+    if(cafe_choice < 1 || cafe_choice > 3) {
+        printError("Invalid choice!");
+        Sleep(1500);
+        return;
+    }
+
+    current_cafe = cafe_choice - 1;
+    Cafe *cafe = &cafes[current_cafe];
+
+    if(cafe->menu_count >= 50) {
+        printError("Maximum menu items reached (50)!");
+        printf("\t\tPress any key to continue...");
+        getch();
+        return;
+    }
+
+    MenuItem new_item;
+    new_item.id = cafe->menu_count + 1;
+
+    printf("\t\tEnter item name: ");
+    clearInputBuffer();
+    fgets(new_item.name, 30, stdin);
+    new_item.name[strcspn(new_item.name, "\n")] = 0;
+
+    printf("\t\tEnter price: Tk.");
+    scanf("%d", &new_item.price);
+
+    printf("\t\tEnter initial quantity: ");
+    scanf("%d", &new_item.quantity);
+
+    cafe->menu[cafe->menu_count] = new_item;
+    cafe->menu_count++;
+
+    save_cafe_data();
+    printSuccess("New menu item added successfully!");
+    printf("\t\tItem ID: %d\n", new_item.id);
     printf("\t\tPress any key to continue...");
     getch();
 }
@@ -1236,8 +1420,10 @@ void admin_panel() {
         printf("\t\t6. Search Order\n");
         printf("\t\t7. View Cafe Details\n");
         printf("\t\t8. Deactivate Student Account\n");
-        printf("\t\t9. Reset All Data\n");
-        printf("\t\t10. Logout\n");
+        printf("\t\t9. Edit Menu Item (Price/Stock)\n");
+        printf("\t\t10. Add New Menu Item\n");
+        printf("\t\t11. Reset All Data\n");
+        printf("\t\t12. Logout\n");
         printf("\t\t============================================================\n");
 
         int choice;
@@ -1273,9 +1459,15 @@ void admin_panel() {
                 deactivate_student();
                 break;
             case 9:
-                reset_all_data();
+                edit_menu_item();
                 break;
             case 10:
+                add_menu_item();
+                break;
+            case 11:
+                reset_all_data();
+                break;
+            case 12:
                 is_admin_logged_in = 0;
                 printInfo("Logged out from admin panel!");
                 Sleep(1500);
@@ -1317,7 +1509,7 @@ int main() {
             printf("\n\t\t");
             drawBorder('=', 70);
             printf("\n\t\tDeveloped by: Marjia Khatun\n");
-            printf("\t\tVersion: 2.0\n");
+            printf("\t\tVersion: 3.0\n");
             printf("\t\t");
             drawBorder('=', 70);
             Sleep(3000);
@@ -1328,8 +1520,6 @@ int main() {
             Sleep(1500);
         }
     }
-
-    // Save data before exit
     save_cafe_data();
     save_students();
 
