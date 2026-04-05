@@ -13,6 +13,6 @@ A comprehensive C-based cafeteria management system designed for Bangladesh Univ
 ## Programming Language
 - C
   
-# Contact
+## Contact
 - **Email**: marjiakhatun.my@gmail.com
 - **LinkedIn**: https://www.linkedin.com/in/marjia-khatun/
